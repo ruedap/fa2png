@@ -6,8 +6,10 @@ Exports [Font Awesome Icons](http://fontawesome.io/icons/) as PNG images for [Al
 ## Setup
 
 ```
-brew install imagemagick
-brew install ghostscript
+$ brew install imagemagick
+$ brew install ghostscript
+$ bundle install
+$ bundle exec rake -T
 ```
 
 ## License
