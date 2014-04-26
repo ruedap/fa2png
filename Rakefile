@@ -5,9 +5,10 @@ OLD_VERSION = '4.0.2'
 
 desc 'Compare PNG files with previous version'
 task :compare do
+  puts "# NEW_VERSION: #{NEW_VERSION} <=> OLD_VERSION: #{OLD_VERSION}"
   fa2png = Fa2png.new(version: NEW_VERSION)
   result = fa2png.compare_all(OLD_VERSION)
-  result.sort! { |a,b| a[:diff][1] <=> b[:diff][1] }
+  result.sort! { |a, b| a[:diff][1] <=> b[:diff][1] }
   puts result
   puts "#{result.size} files difference in #{fa2png.icons_data.size} files."
 end
