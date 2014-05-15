@@ -11,13 +11,13 @@ class Fa2png
   def initialize(version: , size: 128, threshold: 0.01)
     @width = size
     @height = size
-    @font_size = (size * 0.9).ceil
+    @font_size = (size * 0.86).ceil
     @version = version
     @import_dir = IMPORT_DIR_TEMPLATE % @version
     @export_dir = EXPORT_DIR_TEMPLATE % @version
     @font_path = File.expand_path("#{@import_dir}/#{IMPORT_FONT_FILENAME}")
     # TODO: remove magic numbers
-    @char_position = { x: @width * 0.53, y: (@font_size + @height) * 0.43 }
+    @char_position = { x: @width * 0.50, y: (@font_size + @height) * 0.43 }
     @threshold = threshold
   end
 
