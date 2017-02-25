@@ -1,7 +1,7 @@
 require './lib/fa2png'
 
-NEW_VERSION = '4.6.3'
-OLD_VERSION = '4.6.1'
+NEW_VERSION = '4.7.0'
+OLD_VERSION = '4.6.3'
 
 desc 'Compare PNG files with previous version'
 task :compare do
