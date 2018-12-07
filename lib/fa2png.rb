@@ -7,6 +7,7 @@ class Fa2png
   EXPORT_DIR_TEMPLATE = './export/%s'
   IMPORT_FONT_FILENAME = 'fontawesome-webfont.ttf'
   FA5_FONT_FILENAMES = {'brands' => 'fa-brands-400.ttf', 'regular' => 'fa-regular-400.ttf', 'solid' => 'fa-solid-900.ttf'}
+  FA5_FONT_PREFIXES = {'brands' => 'fab', 'regular' => 'far', 'solid' => 'fas'}
   IMPORT_YAML_FILENAME = 'icons.yml'
 
   def initialize(version: , size: 128, threshold: 0.01, color: '#000000', background_color: '#ffffff')
@@ -76,7 +77,7 @@ class Fa2png
         import_font_filename = FA5_FONT_FILENAMES[style]
         font_path = File.expand_path("#{@import_dir}/#{import_font_filename}")
         draw_char(draw, image, char, font_path: font_path)
-        puts export_path = "#{@export_dir}/icons/fa-#{id}-#{style}.png"
+        puts export_path = "#{@export_dir}/icons/#{ FA5_FONT_PREFIXES[style] }-#{id}.png"
         image.write(export_path)
       end
     else
