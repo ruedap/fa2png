@@ -6,13 +6,16 @@ class Fa2png
   IMPORT_DIR_TEMPLATE = './import/%s'
   EXPORT_DIR_TEMPLATE = './export/%s'
   IMPORT_FONT_FILENAME = 'fontawesome-webfont.ttf'
+  FA5_FONT_FILENAMES = {'brands' => 'fa-brands-400.ttf', 'regular' => 'fa-regular-400.ttf', 'solid' => 'fa-solid-900.ttf'}
   IMPORT_YAML_FILENAME = 'icons.yml'
 
-  def initialize(version: , size: 128, threshold: 0.01)
+  def initialize(version: , size: 128, threshold: 0.01, color: '#000000', background_color: '#ffffff')
     @width = size
     @height = size
     @font_size = (size * 0.76).ceil
     @version = version
+    @color = color
+    @background_color = background_color
     @import_dir = IMPORT_DIR_TEMPLATE % @version
     @export_dir = EXPORT_DIR_TEMPLATE % @version
     @font_path = File.expand_path("#{@import_dir}/#{IMPORT_FONT_FILENAME}")
@@ -41,9 +44,11 @@ class Fa2png
     diff[1] > threshold
   end
 
-  def draw_char(draw, image, char, char_position = @char_position)
-    draw.font = @font_path
-    draw.fill = '#000000'
+  def draw_char(draw, image, char, opts = {})
+    char_position = opts[:char_position] || @char_position
+    font_path = opts[:font_path] || @font_path
+    draw.font = font_path
+    draw.fill = @color
     draw.gravity = Magick::CenterGravity
     draw.stroke = 'transparent'
     draw.pointsize = @font_size
@@ -57,14 +62,34 @@ class Fa2png
   def generate(icon_data)
     id = icon_data[:id]
     unicode = icon_data[:unicode]
+    styles = icon_data[:styles]
     char = [Integer("0x#{unicode}")].pack('U*')
 
-    draw = Magick::Draw.new
-    image = Magick::Image.new(@width, @height)
-    draw_char(draw, image, char)
+    if styles
+      styles.each do |style|
+        draw = Magick::Draw.new
+        background_color = @background_color
+        image = Magick::Image.new(@width, @height) do |c|
+          c.background_color = background_color
+        end
 
-    puts export_path = "#{@export_dir}/icons/fa-#{id}.png"
-    image.write(export_path)
+        import_font_filename = FA5_FONT_FILENAMES[style]
+        font_path = File.expand_path("#{@import_dir}/#{import_font_filename}")
+        draw_char(draw, image, char, font_path: font_path)
+        puts export_path = "#{@export_dir}/icons/fa-#{id}-#{style}.png"
+        image.write(export_path)
+      end
+    else
+      draw = Magick::Draw.new
+      background_color = @background_color
+      image = Magick::Image.new(@width, @height) do |c|
+        c.background_color = background_color
+      end
+
+      draw_char(draw, image, char)
+      puts export_path = "#{@export_dir}/icons/fa-#{id}.png"
+      image.write(export_path)
+    end
   end
 
   def generate_all
@@ -74,10 +99,10 @@ class Fa2png
   def icons_data
     result = []
     icons_data_yml.each do |icon|
-      result << { id: icon['id'], unicode: icon['unicode'] }
+      result << { id: icon['id'], unicode: icon['unicode'], styles: icon['styles'] }
       next unless icon['aliases']
       icon['aliases'].each do |alias_name|
-        result << { id: alias_name, unicode: icon['unicode'] }
+        result << { id: alias_name, unicode: icon['unicode'], styles: icon['styles'] }
       end
     end
     result
@@ -85,6 +110,15 @@ class Fa2png
 
   def icons_data_yml
     yml_path = File.expand_path("#{@import_dir}/#{IMPORT_YAML_FILENAME}")
-    YAML.load_file(yml_path)['icons']
+    yml = YAML.load_file(yml_path)
+    if yml['icons']
+      # FA4 syntax
+      yml['icons']
+    else
+      # FA5+ syntax
+      yml.map {|k, v|
+        { 'id' => k, 'unicode' => v['unicode'], 'styles' => v['styles'] }
+      }
+    end
   end
 end
