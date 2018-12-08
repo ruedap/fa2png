@@ -20,7 +20,7 @@ end
 
 desc 'Remove PNG files'
 task :remove do
-  sh %Q|rm ./export/#{NEW_VERSION}/icons/fa-*.png|
+  sh %Q|rm ./export/#{NEW_VERSION}/icons/*.png|
 end
 
 task default: :generate
