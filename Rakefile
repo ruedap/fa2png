@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require './lib/fa2png'
 
 NEW_VERSION = '5.5.0'

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rmagick'
 require 'yaml'
 
@@ -6,11 +8,19 @@ class Fa2png
   IMPORT_DIR_TEMPLATE = './import/%s'
   EXPORT_DIR_TEMPLATE = './export/%s'
   IMPORT_FONT_FILENAME = 'fontawesome-webfont.ttf'
-  FA5_FONT_FILENAMES = {'brands' => 'fa-brands-400.ttf', 'regular' => 'fa-regular-400.ttf', 'solid' => 'fa-solid-900.ttf'}
-  FA5_FONT_PREFIXES = {'brands' => 'fab', 'regular' => 'far', 'solid' => 'fas'}
+  FA5_FONT_FILENAMES = { 'brands' => 'fa-brands-400.ttf',
+                         'regular' => 'fa-regular-400.ttf',
+                         'solid' => 'fa-solid-900.ttf' }.freeze
+  FA5_FONT_PREFIXES = { 'brands' => 'fab',
+                        'regular' => 'far',
+                        'solid' => 'fas' }.freeze
   IMPORT_YAML_FILENAME = 'icons.yml'
 
-  def initialize(version: , size: 128, threshold: 0.01, color: '#000000', background_color: '#ffffff')
+  def initialize(version: nil,
+                 size: 128,
+                 threshold: 0.01,
+                 color: '#000000',
+                 background_color: '#ffffff')
     @width = size
     @height = size
     @font_size = (size * 0.76).ceil
@@ -28,7 +38,7 @@ class Fa2png
   def compare_all(old_version, new_version = @version)
     icons_data.select do |icon_data|
       diff = difference(icon_data[:id], old_version, new_version)
-      icon_data.merge!(diff: diff)
+      icon_data[:diff] = diff
       difference?(diff)
     end
   end
@@ -82,7 +92,8 @@ class Fa2png
       styles.each do |style|
         import_font_filename = FA5_FONT_FILENAMES[style]
         font_path = File.expand_path("#{@import_dir}/#{import_font_filename}")
-        export_path = "#{@export_dir}/icons/#{ FA5_FONT_PREFIXES[style] }-#{id}.png"
+        export_path =
+          "#{@export_dir}/icons/#{FA5_FONT_PREFIXES[style]}-#{id}.png"
         draw_icon char, font_path, export_path
       end
     else
@@ -99,10 +110,15 @@ class Fa2png
   def icons_data
     result = []
     icons_data_yml.each do |icon|
-      result << { id: icon['id'], unicode: icon['unicode'], styles: icon['styles'] }
+      result << { id: icon['id'],
+                  unicode: icon['unicode'],
+                  styles: icon['styles'] }
       next unless icon['aliases']
+
       icon['aliases'].each do |alias_name|
-        result << { id: alias_name, unicode: icon['unicode'], styles: icon['styles'] }
+        result << { id: alias_name,
+                    unicode: icon['unicode'],
+                    styles: icon['styles'] }
       end
     end
     result
@@ -111,14 +127,14 @@ class Fa2png
   def icons_data_yml
     yml_path = File.expand_path("#{@import_dir}/#{IMPORT_YAML_FILENAME}")
     yml = YAML.load_file(yml_path)
-    if yml['icons']
+    if yml['icons'].nil?
+      # FA5+ syntax
+      yml.map do |k, v|
+        { 'id' => k, 'unicode' => v['unicode'], 'styles' => v['styles'] }
+      end
+    else
       # FA4 syntax
       yml['icons']
-    else
-      # FA5+ syntax
-      yml.map {|k, v|
-        { 'id' => k, 'unicode' => v['unicode'], 'styles' => v['styles'] }
-      }
     end
   end
 end
