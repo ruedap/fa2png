@@ -60,6 +60,18 @@ class Fa2png
     draw.draw(image)
   end
 
+  def draw_icon(char, font_path, export_path)
+    draw = Magick::Draw.new
+    background_color = @background_color
+    image = Magick::Image.new(@width, @height) do |c|
+      c.background_color = background_color
+    end
+
+    draw_char(draw, image, char, font_path: font_path)
+    puts export_path
+    image.write(export_path)
+  end
+
   def generate(icon_data)
     id = icon_data[:id]
     unicode = icon_data[:unicode]
@@ -68,28 +80,15 @@ class Fa2png
 
     if styles
       styles.each do |style|
-        draw = Magick::Draw.new
-        background_color = @background_color
-        image = Magick::Image.new(@width, @height) do |c|
-          c.background_color = background_color
-        end
-
         import_font_filename = FA5_FONT_FILENAMES[style]
         font_path = File.expand_path("#{@import_dir}/#{import_font_filename}")
-        draw_char(draw, image, char, font_path: font_path)
-        puts export_path = "#{@export_dir}/icons/#{ FA5_FONT_PREFIXES[style] }-#{id}.png"
-        image.write(export_path)
+        export_path = "#{@export_dir}/icons/#{ FA5_FONT_PREFIXES[style] }-#{id}.png"
+        draw_icon char, font_path, export_path
       end
     else
-      draw = Magick::Draw.new
-      background_color = @background_color
-      image = Magick::Image.new(@width, @height) do |c|
-        c.background_color = background_color
-      end
-
-      draw_char(draw, image, char)
-      puts export_path = "#{@export_dir}/icons/fa-#{id}.png"
-      image.write(export_path)
+      font_path = @font_path
+      export_path = "#{@export_dir}/icons/fa-#{id}.png"
+      draw_icon char, font_path, export_path
     end
   end
 
