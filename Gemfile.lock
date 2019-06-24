@@ -10,3 +10,9 @@ PLATFORMS
 DEPENDENCIES
   rake (= 10.3.1)
   rmagick (= 2.13.2)
+
+RUBY VERSION
+   ruby 2.3.0p0
+
+BUNDLED WITH
+   1.17.1

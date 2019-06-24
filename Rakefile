@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 require './lib/fa2png'
 
-NEW_VERSION = '4.7.0'
+NEW_VERSION = '5.5.0'
 OLD_VERSION = '4.6.3'
 
 desc 'Compare PNG files with previous version'
@@ -20,7 +22,7 @@ end
 
 desc 'Remove PNG files'
 task :remove do
-  sh %Q|rm ./export/#{NEW_VERSION}/icons/fa-*.png|
+  sh %Q|rm ./export/#{NEW_VERSION}/icons/*.png|
 end
 
 task default: :generate
