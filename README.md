@@ -1,6 +1,6 @@
 # fa2png
 
-Exports [Font Awesome icons](http://fontawesome.io/icons/) as PNG images for [Alfred Workflow](https://github.com/ruedap/alfred2-font-awesome-workflow).
+Export [Font Awesome icons](http://fontawesome.io/icons/) as PNG image.
 
 
 ## Setup
